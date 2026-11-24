@@ -1,0 +1,49 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum ServiceType {
+  WASH_ONLY
+  IRON_ONLY
+  WASH_AND_IRON
+}
+
+enum OrderStatus {
+  RECEIVED
+  WASHING
+  READY
+  COLLECTED
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  name         String
+  email        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+}
+
+model LaundryOrder {
+  id            Int         @id @default(autoincrement())
+  customerName  String
+  customerPhone String
+  serviceType   ServiceType
+  totalPrice    Decimal     @db.Decimal(12, 2)
+  status        OrderStatus @default(RECEIVED)
+  notes         String?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+}
+
+model Session {
+  sid    String   @id @db.VarChar
+  sess   Json     @db.Json
+  expire DateTime @db.Timestamp(6)
+
+  @@index([expire], map: "session_expire_idx")
+  @@map("session")
+}
